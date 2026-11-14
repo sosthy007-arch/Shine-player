@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#090909">
+<title>SHINE PLAYER</title>
+<style>
+:root{--bg:#090909;--panel:#151515;--panel2:#202020;--gold:#d8ad52;--muted:#aaa;--line:#2b2b2b}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:#fff;font:15px Arial,sans-serif}
+header{position:sticky;top:0;z-index:5;background:#0d0d0df2;border-bottom:1px solid var(--line);padding:14px 16px;display:flex;align-items:center;justify-content:space-between}
+.logo{font-size:21px;font-weight:900;letter-spacing:1px}.logo span{color:var(--gold)}
+button,.btn{background:var(--gold);color:#111;border:0;border-radius:9px;padding:11px 14px;font-weight:700;cursor:pointer}
+button.secondary{background:#262626;color:#fff;border:1px solid #393939}
+main{max-width:1100px;margin:auto;padding:16px}
+.hero{background:linear-gradient(130deg,#242016,#111 65%);border:1px solid #4a3b20;border-radius:16px;padding:20px;margin-bottom:16px}
+.hero h1{margin:0 0 7px;font-size:25px}.hero p{color:#c9c2b3;margin:0}
+.tabs{display:flex;gap:8px;overflow:auto;margin:16px 0}.tab{white-space:nowrap;background:#1b1b1b;color:#ddd;border:1px solid #333}.tab.active{background:var(--gold);color:#111}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:15px;margin-bottom:15px}
+input{width:100%;background:#0d0d0d;color:#fff;border:1px solid #3a3a3a;border-radius:9px;padding:13px;margin:6px 0 10px;font-size:15px}
+.row{display:flex;gap:8px;flex-wrap:wrap}.row>*{flex:1}
+small,.muted{color:var(--muted)}#player{width:100%;background:#000;border-radius:12px;max-height:55vh;aspect-ratio:16/9}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.toolbar input{flex:1;min-width:180px}
+.layout{display:grid;grid-template-columns:minmax(0,1fr);gap:14px}
+.channels{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:9px}
+.channel{background:#1d1d1d;border:1px solid #333;border-radius:11px;padding:12px;text-align:left;color:#fff;min-height:75px;overflow:hidden}
+.channel strong{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.channel small{display:block;margin-top:6px}
+.channel.selected{border-color:var(--gold);background:#2a2418}
+.hidden{display:none!important}.empty{text-align:center;color:#aaa;padding:28px 10px}
+footer{text-align:center;color:#777;padding:24px;font-size:12px}
+.plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin:12px 0}
+.plan{background:#101010;border:1px solid #514225;border-radius:12px;padding:14px}
+.plan h4{margin:0 0 8px;color:var(--gold)}
+.price{font-size:25px;font-weight:900;margin:5px 0}
+.pay-method{background:#101010;border:1px solid #333;border-radius:11px;padding:13px;margin:10px 0}
+.pay-number{font-size:19px;font-weight:800;letter-spacing:.5px;margin:8px 0}
+.notice{background:#241f14;border:1px solid #514225;border-radius:10px;padding:12px;color:#e9dfc8;line-height:1.45}
+@media(min-width:800px){.layout{grid-template-columns:1.3fr .7fr}}
+</style>
+</head>
+<body>
+<header><div class="logo">SHINE <span>PLAYER</span></div><button class="secondary" id="settingsBtn">⚙ Paramètres</button></header>
+<main>
+<section class="hero"><h1>Votre lecteur IPTV</h1><p>Importez votre playlist M3U ou connectez votre propre liste IPTV.</p></section>
+<section class="panel" id="setup">
+<h3 style="margin-top:0">Ajouter une playlist</h3>
+<label for="playlistUrl">Lien M3U / M3U8</label><input id="playlistUrl" type="url" placeholder="https://exemple.com/playlist.m3u">
+<div class="row"><button id="loadUrl">Charger le lien</button><button class="secondary" id="fileBtn">Importer un fichier</button></div>
+<input id="fileInput" type="file" accept=".m3u,.m3u8,.txt" class="hidden">
+<p class="muted" id="status">Utilisez uniquement une playlist que vous êtes autorisé à regarder.</p>
+</section>
+<section class="panel hidden" id="playerPanel">
+<div class="layout">
+<div><video id="player" controls playsinline></video><div style="margin-top:10px"><strong id="nowPlaying">Choisissez une chaîne</strong><div class="muted" id="playInfo">Le lecteur prend en charge les flux compatibles navigateur.</div></div></div>
+<div><h3 style="margin-top:0">Playlist</h3><div class="toolbar"><input id="search" placeholder="Rechercher une chaîne…"><button class="secondary" id="favOnly">☆ Favoris</button></div><div class="muted" id="count"></div></div>
+</div>
+<div class="tabs" id="groups"></div><div class="channels" id="channels"></div>
+</section>
+<section class="panel hidden" id="settings">
+<h3 style="margin-top:0">Paramètres</h3>
+<p>Les playlists sont conservées dans ce navigateur sur cet appareil.</p>
+<button class="secondary" id="clearBtn">Supprimer la playlist enregistrée</button>
+<button class="secondary" id="closeSettings">Fermer</button>
+</section>
+
+<section class="panel" id="payment">
+<h3 style="margin-top:0;color:var(--gold)">PAIEMENT · SHINE PLAYER</h3>
+<p class="muted">Choisissez votre formule d'abonnement.</p>
+<div class="plans">
+  <div class="plan"><h4>Abonnement annuel</h4><div class="price">7 000 FCFA</div><div class="muted">Valable 12 mois</div></div>
+  <div class="plan"><h4>Accès illimité à vie</h4><div class="price">14 000 FCFA</div><div class="muted">Sans renouvellement</div></div>
+</div>
+<h4>Moyens de paiement</h4>
+<div class="pay-method">
+  <strong>MTN Mobile Money</strong>
+  <div class="pay-number" id="mtnNumber">+242 06 896 01 84</div>
+  <button type="button" class="secondary" data-copy="+242068960184">Copier le numéro MTN</button>
+</div>
+<div class="pay-method">
+  <strong>Airtel Money</strong>
+  <div class="pay-number" id="airtelNumber">+242 05 500 00 72</div>
+  <button type="button" class="secondary" data-copy="+242055000072">Copier le numéro Airtel</button>
+</div>
+<div class="notice">
+  <strong>Important :</strong> effectuez le transfert vers le numéro correspondant, puis conservez votre reçu. Contactez le vendeur ou l'administrateur de SHINE PLAYER pour faire vérifier le paiement et activer votre formule. Le paiement n'est pas vérifié automatiquement dans cette version.
+</div>
+<p id="copyStatus" class="muted" aria-live="polite"></p>
+</section>
+</main>
+<footer>SHINE PLAYER · Lecteur indépendant · N'héberge aucun flux TV</footer>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+<script>
+const $=id=>document.getElementById(id);
+let items=[],activeGroup='Toutes',favorites=new Set(JSON.parse(localStorage.getItem('shine_favs')||'[]')),favMode=false,hls=null,current=-1;
+function setStatus(s){$('status').textContent=s}
+function parseM3U(text){
+ const lines=text.replace(/^\uFEFF/,'').split(/\r?\n/);let out=[],meta={};
+ for(const raw of lines){const line=raw.trim();if(!line)continue;
+  if(line.startsWith('#EXTINF')){const comma=line.lastIndexOf(',');const attrs=line.slice(0,comma<0?line.length:comma);const name=comma<0?'Chaîne sans nom':line.slice(comma+1).trim();
+   const get=(key)=>{const m=attrs.match(new RegExp(key+'="([^"]*)"','i'));return m?m[1]:''};
+   meta={name:name||'Chaîne',group:get('group-title')||'Autres',logo:get('tvg-logo'),tvg:get('tvg-id')};
+  }else if(!line.startsWith('#')){out.push({...meta,url:line,id:out.length});meta={};}
+ }
+ return out;
+}
+function loadText(text,label){
+ const parsed=parseM3U(text);if(!parsed.length){setStatus('Aucune chaîne trouvée. Vérifiez le format de votre fichier ou lien M3U.');return}
+ items=parsed;localStorage.setItem('shine_playlist_text',text);localStorage.setItem('shine_playlist_name',label||'Ma playlist');
+ $('setup').classList.add('hidden');$('playerPanel').classList.remove('hidden');$('settings').classList.add('hidden');
+ activeGroup='Toutes';favMode=false;render();setStatus('');window.scrollTo({top:0,behavior:'smooth'});
+}
+function render(){
+ const groups=['Toutes',...new Set(items.map(x=>x.group||'Autres'))];$('groups').innerHTML='';
+ groups.forEach(g=>{const b=document.createElement('button');b.className='tab'+(g===activeGroup?' active':'');b.textContent=g;b.onclick=()=>{activeGroup=g;favMode=false;render()};$('groups').appendChild(b)});
+ const q=$('search').value.toLowerCase();const filtered=items.filter(x=>(activeGroup==='Toutes'||(x.group||'Autres')===activeGroup)&&(!favMode||favorites.has(x.url))&&(x.name+' '+x.group).toLowerCase().includes(q));
+ $('count').textContent=filtered.length+' chaîne(s)';$('channels').innerHTML='';
+ if(!filtered.length){$('channels').innerHTML='<div class="empty">Aucune chaîne dans cette catégorie.</div>';return}
+ filtered.forEach(x=>{const b=document.createElement('button');b.className='channel'+(items[current]?.url===x.url?' selected':'');b.innerHTML='<strong></strong><small></small>';b.querySelector('strong').textContent=x.name;b.querySelector('small').textContent=(favorites.has(x.url)?'★ ':'')+(x.group||'Autres');b.onclick=()=>play(x);$('channels').appendChild(b)});
+}
+function play(x){
+ current=items.findIndex(i=>i.url===x.url);const v=$('player');
+ if(hls){hls.destroy();hls=null}v.pause();v.removeAttribute('src');v.load();
+ $('nowPlaying').textContent=x.name;$('playInfo').textContent=x.group||'';
+ if(x.url.includes('.m3u8')&&window.Hls&&Hls.isSupported()){hls=new Hls();hls.loadSource(x.url);hls.attachMedia(v);hls.on(Hls.Events.ERROR,(_,d)=>{if(d.fatal)$('playInfo').textContent='Lecture impossible : flux inaccessible ou format non pris en charge.'})}
+ else if(v.canPlayType('application/vnd.apple.mpegurl'))v.src=x.url;else v.src=x.url;
+ v.play().catch(()=>{$('playInfo').textContent='Lecture bloquée ou format non compatible. Essayez un autre flux.'});render();
+}
+$('loadUrl').onclick=async()=>{const url=$('playlistUrl').value.trim();if(!url)return setStatus('Ajoutez un lien M3U.');setStatus('Chargement…');try{const r=await fetch(url);if(!r.ok)throw Error('HTTP '+r.status);loadText(await r.text(),'Playlist distante')}catch(e){setStatus('Impossible de récupérer le lien. Le serveur peut bloquer le chargement (CORS) ; essayez le fichier M3U.')}};
+$('fileBtn').onclick=()=>$('fileInput').click();
+$('fileInput').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>loadText(r.result,f.name);r.readAsText(f)};
+$('search').oninput=render;
+$('favOnly').onclick=()=>{favMode=!favMode;$('favOnly').textContent=favMode?'★ Tous':'☆ Favoris';render()};
+$('channels').addEventListener('contextmenu',e=>{e.preventDefault()});
+$('settingsBtn').onclick=()=>$('settings').classList.toggle('hidden');
+$('closeSettings').onclick=()=>$('settings').classList.add('hidden');
+$('clearBtn').onclick=()=>{if(confirm('Supprimer la playlist enregistrée sur cet appareil ?')){localStorage.removeItem('shine_playlist_text');items=[];$('playerPanel').classList.add('hidden');$('setup').classList.remove('hidden');$('settings').classList.add('hidden');$('player').pause();}};
+$('channels').addEventListener('dblclick',e=>{});
+$('player').addEventListener('error',()=>$('playInfo').textContent='Erreur de lecture : vérifiez le lien et la compatibilité du flux.');
+$('channels').addEventListener('click',e=>{const b=e.target.closest('.channel');if(!b)return;const name=b.querySelector('strong').textContent;const x=items.find(i=>i.name===name&&((activeGroup==='Toutes'||i.group===activeGroup)));if(!x)return;});
+document.querySelectorAll('[data-copy]').forEach(btn=>btn.addEventListener('click',async()=>{
+ const value=btn.dataset.copy;
+ try{await navigator.clipboard.writeText(value);$('copyStatus').textContent='Numéro copié.';}
+ catch(e){$('copyStatus').textContent='Copie non disponible sur ce navigateur. Vous pouvez recopier le numéro affiché.';}
+}));
+const saved=localStorage.getItem('shine_playlist_text');if(saved){try{loadText(saved,localStorage.getItem('shine_playlist_name'))}catch(e){}}
+</script>
+</body></html>
