@@ -4,668 +4,460 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#090909">
-<meta name="description" content="SHINE PLAYER - Lecteur IPTV indépendant">
+<meta name="theme-color" content="#080808">
 <title>SHINE PLAYER</title>
-
 <style>
-:root{
- --bg:#090909;
- --panel:#151515;
- --panel2:#202020;
- --gold:#d8ad52;
- --muted:#aaa;
- --line:#303030;
-}
+:root{--bg:#080808;--panel:#151515;--panel2:#202020;--gold:#d8ad52;--muted:#aaa;--line:#303030}
 *{box-sizing:border-box}
-body{
- margin:0;background:var(--bg);color:white;
- font:15px Arial,sans-serif;
-}
-header{
- position:sticky;top:0;z-index:10;
- background:#0d0d0df5;
- border-bottom:1px solid var(--line);
- padding:14px 16px;
- display:flex;align-items:center;
- justify-content:space-between;
-}
-.logo{font-size:21px;font-weight:900;letter-spacing:1px}
-.logo span{color:var(--gold)}
-button{
- background:var(--gold);color:#111;
- border:0;border-radius:9px;
- padding:11px 14px;font-weight:700;
- cursor:pointer;
-}
-button:disabled{opacity:.5;cursor:not-allowed}
-button.secondary{
- background:#262626;color:white;
- border:1px solid #393939;
-}
+body{margin:0;background:var(--bg);color:white;font:15px Arial,sans-serif}
+button,input,select{font:inherit}
+button{cursor:pointer;border:0;border-radius:9px;padding:12px 15px;background:var(--gold);color:#111;font-weight:bold}
+button.secondary{background:#292929;color:white;border:1px solid #414141}
+header{position:sticky;top:0;z-index:10;background:#0b0b0bf5;border-bottom:1px solid #333;padding:14px 16px;display:flex;justify-content:space-between;align-items:center}
+.logo{font-size:22px;font-weight:900;letter-spacing:2px}.logo span{color:var(--gold)}
 main{max-width:1150px;margin:auto;padding:16px}
-.hero{
- background:linear-gradient(130deg,#292116,#111 65%);
- border:1px solid #514225;
- border-radius:16px;padding:21px;margin-bottom:16px;
-}
-.hero h1{margin:0 0 8px;font-size:25px}
-.hero p{color:#c9c2b3;margin:0;line-height:1.5}
-.panel{
- background:var(--panel);
- border:1px solid var(--line);
- border-radius:14px;padding:15px;margin-bottom:15px;
-}
-input{
- width:100%;background:#0d0d0d;color:white;
- border:1px solid #3a3a3a;border-radius:9px;
- padding:13px;margin:6px 0 10px;font-size:15px;
-}
-.row{display:flex;gap:8px;flex-wrap:wrap}
-.row>*{flex:1}
-small,.muted{color:var(--muted)}
-label{display:block;margin-top:12px}
+.hero{background:linear-gradient(130deg,#302516,#111 65%);border:1px solid #574526;border-radius:16px;padding:22px;margin-bottom:16px}
+.hero h1{font-size:26px;margin:0 0 8px}.hero p{color:#ccc;margin:0;line-height:1.5}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:15px}
+.nav{display:flex;gap:8px;overflow-x:auto;margin:15px 0;padding-bottom:5px}
+.nav button{white-space:nowrap;background:#202020;color:#ddd;border:1px solid #393939}
+.nav button.active{background:var(--gold);color:#111}
+input,select{width:100%;background:#0b0b0b;color:white;border:1px solid #414141;border-radius:9px;padding:13px;margin:6px 0 12px}
+label{display:block;color:#ccc;font-size:13px;margin-top:8px}
+.row{display:flex;gap:9px;flex-wrap:wrap}.row>*{flex:1;min-width:120px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:10px}
+.item{background:#202020;color:white;border:1px solid #393939;text-align:left;min-height:85px;overflow:hidden}
+.item strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.item small{display:block;color:#aaa;margin-top:8px}
+.stat{background:#101010;border:1px solid #393939;border-radius:12px;padding:15px}
+.stat strong{display:block;color:var(--gold);font-size:20px;margin-top:7px}
+.device{background:#0d0d0d;border:1px solid #514225;padding:14px;border-radius:12px;overflow-wrap:anywhere}
+#player{width:100%;background:black;border-radius:12px;aspect-ratio:16/9;max-height:55vh}
 .hidden{display:none!important}
-.layout{display:grid;grid-template-columns:1fr;gap:16px}
-#player{
- width:100%;background:black;border-radius:12px;
- aspect-ratio:16/9;max-height:55vh;
-}
+.muted{color:var(--muted);line-height:1.5}
+.notice{background:#282114;border:1px solid #574526;border-radius:10px;padding:13px;color:#eee0c1;line-height:1.5}
+footer{text-align:center;color:#777;padding:25px;font-size:12px}
+.price{font-size:25px;font-weight:900;color:var(--gold);margin:10px 0}
+.plan{background:#101010;border:1px solid #514225;border-radius:12px;padding:15px}
 .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
-.toolbar input{flex:1;min-width:150px}
-.tabs{
- display:flex;gap:8px;overflow-x:auto;
- margin:16px 0;padding-bottom:5px;
-}
-.tab{white-space:nowrap;background:#1b1b1b;color:#ddd;border:1px solid #333}
-.tab.active{background:var(--gold);color:#111}
-.channels{
- display:grid;
- grid-template-columns:repeat(auto-fill,minmax(145px,1fr));
- gap:9px;
-}
-.channel{
- position:relative;background:#1d1d1d;
- border:1px solid #333;border-radius:11px;
- min-height:85px;padding:12px 37px 12px 12px;
- text-align:left;color:white;width:100%;
-}
-.channel strong{
- display:block;white-space:nowrap;
- overflow:hidden;text-overflow:ellipsis;
-}
-.channel small{display:block;margin-top:7px}
-.channel.selected{border-color:var(--gold);background:#2a2418}
-.fav{
- position:absolute;right:7px;top:7px;
- padding:5px;background:#303030;
- color:var(--gold);border:1px solid #444;
- min-width:29px;
-}
-.empty{text-align:center;color:#aaa;padding:28px 10px}
-.notice{
- background:#241f14;border:1px solid #514225;
- border-radius:10px;padding:12px;
- color:#e9dfc8;line-height:1.5;
-}
-.status{margin-top:10px;line-height:1.5}
-footer{text-align:center;color:#777;padding:24px;font-size:12px}
-@media(min-width:800px){
- .layout{grid-template-columns:1.3fr .7fr}
-}
+.toolbar input{flex:1;min-width:160px}
+#message{padding:10px;color:var(--gold);line-height:1.5}
+@media(min-width:800px){.player-layout{display:grid;grid-template-columns:1.5fr 1fr;gap:15px}}
 </style>
 </head>
-
 <body>
 
 <header>
  <div class="logo">SHINE <span>PLAYER</span></div>
- <button class="secondary" id="settingsBtn">⚙ Paramètres</button>
+ <button class="secondary" id="settingsQuick">⚙</button>
 </header>
 
 <main>
 
-<section class="hero">
- <h1>Bienvenue sur SHINE PLAYER</h1>
- <p>Votre lecteur IPTV indépendant. Importez votre playlist M3U ou connectez votre propre liste.</p>
+<section id="home">
+ <div class="hero">
+  <div style="color:var(--gold);font-weight:bold;letter-spacing:3px">WELCOME TO</div>
+  <h1>SHINE PLAYER</h1>
+  <p>Votre univers de divertissement. Regardez vos contenus préférés depuis votre propre abonnement IPTV.</p>
+ </div>
+
+ <div class="panel">
+  <h3>Mon appareil</h3>
+  <div class="device">
+   <div class="muted">Device ID</div>
+   <strong id="deviceId">Chargement...</strong>
+   <div class="toolbar">
+    <button class="secondary" id="copyDevice">Copier l'identifiant</button>
+   </div>
+   <div class="muted">Identifiant local de cet appareil, pas une véritable adresse MAC.</div>
+  </div>
+ </div>
+
+ <div class="grid">
+  <div class="stat">Télévision<strong id="liveCount">0</strong></div>
+  <div class="stat">Films<strong id="movieCount">0</strong></div>
+  <div class="stat">Séries<strong id="seriesCount">0</strong></div>
+ </div>
+
+ <div class="panel">
+  <h3>Connecter votre playlist</h3>
+  <p class="muted">Choisissez votre méthode de connexion.</p>
+  <div class="row">
+   <button id="openXtream">Xtream Codes</button>
+   <button class="secondary" id="openM3u">Playlist M3U</button>
+  </div>
+ </div>
 </section>
 
-<section class="panel" id="setup">
- <h3>Ajouter une playlist</h3>
+<nav class="nav">
+ <button class="active" data-page="home">Accueil</button>
+ <button data-page="live">TV en direct</button>
+ <button data-page="movies">Films</button>
+ <button data-page="series">Séries</button>
+ <button data-page="favorites">Favoris</button>
+ <button data-page="settings">Paramètres</button>
+ <button data-page="payment">Abonnement</button>
+</nav>
 
- <label for="playlistUrl">Lien M3U / M3U8</label>
- <input id="playlistUrl" type="url"
- placeholder="https://exemple.com/playlist.m3u">
-
+<section id="xtream" class="panel hidden">
+ <h3>Connexion Xtream Codes</h3>
+ <p class="muted">Entrez les informations fournies par votre fournisseur IPTV.</p>
+ <label>Adresse du serveur</label>
+ <input id="server" placeholder="http://serveur.com:8080">
+ <label>Nom d'utilisateur</label>
+ <input id="username" placeholder="Votre identifiant">
+ <label>Mot de passe</label>
+ <input id="password" type="password" placeholder="Votre mot de passe">
  <div class="row">
-  <button id="loadUrl">Charger le lien</button>
-  <button class="secondary" id="fileBtn">Importer un fichier</button>
+  <button id="connectXtream">Se connecter</button>
+  <button class="secondary" id="cancelXtream">Annuler</button>
  </div>
-
- <input id="fileInput" type="file"
- accept=".m3u,.m3u8,.txt" class="hidden">
-
- <p class="muted" id="status" aria-live="polite">
- Utilisez uniquement une playlist que vous êtes autorisé à regarder.
- </p>
+ <div id="xtreamStatus" class="muted"></div>
 </section>
 
-<section class="panel hidden" id="playerPanel">
-
- <div class="layout">
-  <div>
-   <video id="player" controls playsinline
-    preload="metadata"></video>
-
-   <div style="margin-top:12px">
-    <strong id="nowPlaying">Choisissez une chaîne</strong>
-    <div class="muted status" id="playInfo">
-     Votre lecteur est prêt.
-    </div>
-   </div>
-  </div>
-
-  <div>
-   <h3 style="margin-top:0">Mes chaînes</h3>
-
-   <div class="toolbar">
-    <input id="search" type="search"
-     placeholder="Rechercher une chaîne...">
-   </div>
-
-   <div class="toolbar">
-    <button class="secondary" id="favOnly">☆ Favoris</button>
-    <button class="secondary" id="allChannels">Toutes</button>
-   </div>
-
-   <div class="muted" id="count"></div>
-  </div>
- </div>
-
- <div class="tabs" id="groups"></div>
- <div class="channels" id="channels"></div>
-
+<section id="m3u" class="panel hidden">
+ <h3>Importer une playlist M3U</h3>
+ <label>Lien de votre playlist</label>
+ <input id="m3uUrl" placeholder="https://exemple.com/playlist.m3u">
+ <button id="loadM3u">Charger le lien</button>
+ <p class="muted">Ou importer un fichier M3U depuis votre téléphone.</p>
+ <input type="file" id="m3uFile" accept=".m3u,.m3u8,.txt">
+ <button class="secondary" id="cancelM3u">Annuler</button>
+ <div id="m3uStatus" class="muted"></div>
 </section>
 
-<section class="panel hidden" id="settings">
+<section id="live" class="panel hidden">
+ <h3>📺 Télévision en direct</h3>
+ <div class="player-layout">
+  <div>
+   <video id="player" controls playsinline></video>
+   <h3 id="playingTitle">Choisissez une chaîne</h3>
+   <p id="playStatus" class="muted">Lecteur prêt.</p>
+  </div>
+  <div>
+   <input id="liveSearch" placeholder="Rechercher une chaîne...">
+   <div id="liveList" class="grid"></div>
+  </div>
+ </div>
+</section>
+
+<section id="movies" class="panel hidden">
+ <h3>🎬 Films</h3>
+ <input id="movieSearch" placeholder="Rechercher un film...">
+ <div id="movieList" class="grid"></div>
+</section>
+
+<section id="series" class="panel hidden">
+ <h3>📺 Séries</h3>
+ <input id="seriesSearch" placeholder="Rechercher une série...">
+ <div id="seriesList" class="grid"></div>
+</section>
+
+<section id="favorites" class="panel hidden">
+ <h3>⭐ Mes favoris</h3>
+ <div id="favoriteList" class="grid"></div>
+</section>
+
+<section id="settings" class="panel hidden">
  <h3>⚙ Paramètres</h3>
-
- <p class="muted">
- Gérez votre playlist et vos préférences sur cet appareil.
- </p>
-
- <div class="notice">
-  SHINE PLAYER fonctionne comme lecteur indépendant.
-  Aucun abonnement en ligne, aucune clé de paiement
-  et aucune passerelle de paiement ne sont nécessaires
-  pour utiliser ou déployer cette version.
+ <div class="device">
+  <p>Identifiant de cet appareil</p>
+  <strong id="deviceSettings"></strong>
  </div>
-
- <div class="toolbar">
-  <button class="secondary" id="changePlaylist">
-   Ajouter ou changer de playlist
-  </button>
+ <h4>Gestion de la playlist</h4>
+ <div class="row">
+  <button id="changePlaylist">Changer de playlist</button>
+  <button class="secondary" id="removePlaylist">Supprimer la playlist</button>
  </div>
-
- <div class="toolbar">
-  <button class="secondary" id="clearBtn">
-   Supprimer la playlist
-  </button>
-  <button class="secondary" id="clearFav">
-   Effacer les favoris
-  </button>
+ <h4>Compte</h4>
+ <p class="muted">Les identifiants de connexion peuvent être conservés sur cet appareil.</p>
+ <button class="secondary" id="logout">Déconnecter le compte</button>
+ <div class="notice" style="margin-top:15px">
+  L'identifiant Device ID ne constitue pas une activation serveur.
+  La véritable validation MAC/Device Key nécessite un backend sécurisé.
  </div>
-
- <button class="secondary" id="closeSettings">Fermer</button>
 </section>
 
+<section id="payment" class="panel hidden">
+ <h3 style="color:var(--gold)">SHINE PLAYER · ABONNEMENT</h3>
+ <p class="muted">Le paiement en ligne n'est pas obligatoire pour utiliser le lecteur.</p>
+
+ <div class="grid">
+  <div class="plan">
+   <h4>Abonnement annuel</h4>
+   <div class="price">7 000 FCFA</div>
+   <p class="muted">Valable 12 mois.</p>
+  </div>
+  <div class="plan">
+   <h4>Accès à vie</h4>
+   <div class="price">14 000 FCFA</div>
+   <p class="muted">Sans renouvellement.</p>
+  </div>
+ </div>
+
+ <h3>Moyens de paiement manuel</h3>
+ <div class="panel">
+  <strong>MTN Mobile Money</strong>
+  <div class="price">+242 06 896 01 84</div>
+  <button class="secondary" data-copy="+242068960184">Copier le numéro</button>
+ </div>
+ <div class="panel">
+  <strong>Airtel Money</strong>
+  <div class="price">+242 05 500 00 72</div>
+  <button class="secondary" data-copy="+242055000072">Copier le numéro</button>
+ </div>
+ <div class="notice">
+  Après le transfert, conservez votre reçu et contactez l'administrateur pour vérifier le paiement. Aucune activation automatique n'est effectuée ici.
+ </div>
+ <p id="paymentStatus" class="muted"></p>
+</section>
+
+<div id="message" aria-live="polite"></div>
 </main>
 
-<footer>
- SHINE PLAYER · Lecteur indépendant ·
- N'héberge aucun flux TV
-</footer>
+<footer>SHINE PLAYER · Lecteur indépendant · 2026</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/hls.js@1.6.13"></script>
-
 <script>
-"use strict";
+const $=id=>document.getElementById(id);
+const pages=["home","live","movies","series","favorites","settings","payment"];
+let channels=[],movies=[],series=[],favorites=[];
+let credentials=null,server="",hls=null;
 
-const $ = id => document.getElementById(id);
-
-const STORAGE = {
- playlist: "shine_player_playlist",
- name: "shine_player_name",
- favorites: "shine_player_favorites"
-};
-
-let items = [];
-let activeGroup = "Toutes";
-let favMode = false;
-let current = -1;
-let hls = null;
-let favorites = new Set();
-
-try {
- favorites = new Set(
-  JSON.parse(localStorage.getItem(STORAGE.favorites) || "[]")
- );
-} catch(e) {
- favorites = new Set();
+function message(s){$("message").textContent=s}
+function save(key,value){
+ try{localStorage.setItem("shine_"+key,JSON.stringify(value))}
+ catch(e){message("Stockage indisponible sur cet appareil.")}
 }
-
-function setStatus(message){
- $("status").textContent = message;
+function read(key,def){
+ try{return JSON.parse(localStorage.getItem("shine_"+key))??def}
+ catch(e){return def}
 }
-
-function saveFavorites(){
- try {
-  localStorage.setItem(
-   STORAGE.favorites,
-   JSON.stringify([...favorites])
-  );
- } catch(e) {}
-}
-
-function validUrl(value){
- try {
-  const u = new URL(value);
-  return u.protocol === "http:" || u.protocol === "https:";
- } catch(e) {
-  return false;
+function deviceID(){
+ let id=localStorage.getItem("shine_device_id");
+ if(!id){
+  const bytes=crypto.getRandomValues(new Uint8Array(6));
+  id="SHINE-"+Array.from(bytes,x=>x.toString(16).padStart(2,"0")).join("").toUpperCase();
+  localStorage.setItem("shine_device_id",id);
  }
+ return id;
 }
+const id=deviceID();
+$("deviceId").textContent=id;
+$("deviceSettings").textContent=id;
 
+function page(name){
+ pages.forEach(p=>$(p).classList.toggle("hidden",p!==name));
+ document.querySelectorAll("[data-page]").forEach(b=>b.classList.toggle("active",b.dataset.page===name));
+ if(name==="favorites")renderFavorites();
+}
+document.querySelectorAll("[data-page]").forEach(b=>b.onclick=()=>page(b.dataset.page));
+
+$("settingsQuick").onclick=()=>page("settings");
+$("openXtream").onclick=()=>{page("home");$("xtream").classList.remove("hidden");$("m3u").classList.add("hidden")};
+$("openM3u").onclick=()=>{page("home");$("m3u").classList.remove("hidden");$("xtream").classList.add("hidden")};
+$("cancelXtream").onclick=()=>$("xtream").classList.add("hidden");
+$("cancelM3u").onclick=()=>$("m3u").classList.add("hidden");
+$("copyDevice").onclick=()=>navigator.clipboard?.writeText(id).then(()=>message("Identifiant copié.")).catch(()=>message("Copiez manuellement : "+id));
+
+function safeUrl(s){
+ try{let u=new URL(s);return ["http:","https:"].includes(u.protocol)}
+ catch(e){return false}
+}
 function parseM3U(text){
- const lines = text.replace(/^\uFEFF/,"").split(/\r?\n/);
- const result = [];
- let meta = {};
-
- for(const raw of lines){
-  const line = raw.trim();
-  if(!line) continue;
-
+ let result=[],meta={};
+ for(const raw of text.replace(/^\uFEFF/,"").split(/\r?\n/)){
+  let line=raw.trim();
+  if(!line)continue;
   if(line.startsWith("#EXTINF")){
-   const comma = line.lastIndexOf(",");
-   const attrs = line.slice(0,comma < 0 ? line.length : comma);
-   const name = comma < 0 ? "Chaîne sans nom" :
-    line.slice(comma + 1).trim();
-
-   function getAttr(key){
-    const regex = new RegExp(
-     '(?:^|\\s)' + key + '="([^"]*)"','i'
-    );
-    const match = attrs.match(regex);
-    return match ? match[1] : "";
-   }
-
-   meta = {
-    name: name || "Chaîne",
-    group: getAttr("group-title") || "Autres",
-    logo: getAttr("tvg-logo"),
-    tvg: getAttr("tvg-id")
+   let i=line.lastIndexOf(",");
+   let attrs=line.slice(0,i<0?line.length:i);
+   const get=k=>attrs.match(new RegExp(k+'="([^"]*)"','i'))?.[1]||"";
+   meta={
+    name:i<0?"Chaîne":line.slice(i+1).trim(),
+    group:get("group-title")||"Autres",
+    logo:get("tvg-logo")
    };
-
-  } else if(!line.startsWith("#")){
-   if(validUrl(line)){
-    result.push({
-     name: meta.name || "Chaîne",
-     group: meta.group || "Autres",
-     logo: meta.logo || "",
-     tvg: meta.tvg || "",
-     url: line,
-     id: result.length
-    });
-   }
-   meta = {};
+  }else if(!line.startsWith("#")){
+   if(safeUrl(line))result.push({...meta,name:meta.name||"Chaîne",group:meta.group||"Autres",url:line});
+   meta={};
   }
  }
-
  return result;
 }
-
-function loadText(text,label){
- if(typeof text !== "string" || !text.trim()){
-  setStatus("Le fichier est vide.");
-  return;
- }
-
- const parsed = parseM3U(text);
-
- if(!parsed.length){
-  setStatus("Aucune chaîne valide trouvée. Vérifiez votre playlist.");
-  return;
- }
-
- items = parsed;
- current = -1;
-
- try {
-  localStorage.setItem(STORAGE.playlist,text);
-  localStorage.setItem(STORAGE.name,label || "Ma playlist");
- } catch(e) {
-  setStatus("Playlist chargée, mais stockage impossible sur cet appareil.");
- }
-
- $("setup").classList.add("hidden");
- $("settings").classList.add("hidden");
- $("playerPanel").classList.remove("hidden");
-
- $("search").value = "";
- activeGroup = "Toutes";
- favMode = false;
- $("favOnly").textContent = "☆ Favoris";
-
- render();
- setStatus("");
- window.scrollTo({top:0,behavior:"smooth"});
+function loadChannels(list){
+ channels=list;
+ movies=[];series=[];
+ save("channels",channels);
+ renderAll();
+ $("m3u").classList.add("hidden");
+ $("xtream").classList.add("hidden");
+ page("live");
+ message(channels.length+" chaînes chargées.");
 }
-
-function render(){
- const groups = [
-  "Toutes",
-  ...new Set(items.map(x => x.group || "Autres"))
- ];
-
- $("groups").innerHTML = "";
-
- groups.forEach(group => {
-  const button = document.createElement("button");
-  button.className = "tab" +
-   (group === activeGroup ? " active" : "");
-  button.textContent = group;
-
-  button.onclick = () => {
-   activeGroup = group;
-   render();
-  };
-
-  $("groups").appendChild(button);
- });
-
- const query = $("search").value.toLowerCase().trim();
-
- const filtered = items.filter(item => {
-  const groupOk = activeGroup === "Toutes" ||
-   item.group === activeGroup;
-
-  const favoriteOk = !favMode ||
-   favorites.has(item.url);
-
-  const searchOk = (
-   item.name + " " + item.group + " " + item.tvg
-  ).toLowerCase().includes(query);
-
-  return groupOk && favoriteOk && searchOk;
- });
-
- $("count").textContent = filtered.length +
-  " chaîne(s) disponible(s)";
-
- $("channels").innerHTML = "";
-
- if(!filtered.length){
-  const empty = document.createElement("div");
-  empty.className = "empty";
-  empty.textContent = "Aucune chaîne trouvée.";
-  $("channels").appendChild(empty);
-  return;
+$("loadM3u").onclick=async()=>{
+ const url=$("m3uUrl").value.trim();
+ if(!safeUrl(url)){ $("m3uStatus").textContent="Lien HTTP/HTTPS invalide.";return}
+ $("m3uStatus").textContent="Chargement...";
+ try{
+  let r=await fetch(url);
+  if(!r.ok)throw Error();
+  loadChannels(parseM3U(await r.text()));
+ }catch(e){
+  $("m3uStatus").textContent="Impossible de charger ce lien. Le serveur peut bloquer CORS. Essayez l'importation du fichier.";
  }
+};
+$("m3uFile").onchange=e=>{
+ let f=e.target.files[0];if(!f)return;
+ let reader=new FileReader();
+ reader.onload=()=>loadChannels(parseM3U(reader.result));
+ reader.onerror=()=>message("Erreur de lecture du fichier.");
+ reader.readAsText(f);
+};
 
- filtered.forEach(item => {
-  const card = document.createElement("div");
-  card.style.position = "relative";
-
-  const playButton = document.createElement("button");
-  playButton.className = "channel" +
-   (items[current]?.url === item.url ? " selected" : "");
-
-  const title = document.createElement("strong");
-  title.textContent = item.name;
-
-  const subtitle = document.createElement("small");
-  subtitle.textContent = item.group;
-
-  playButton.appendChild(title);
-  playButton.appendChild(subtitle);
-  playButton.onclick = () => play(item);
-
-  const favoriteButton = document.createElement("button");
-  favoriteButton.className = "fav";
-  favoriteButton.type = "button";
-  favoriteButton.textContent =
-   favorites.has(item.url) ? "★" : "☆";
-  favoriteButton.title = "Ajouter ou retirer des favoris";
-
-  favoriteButton.onclick = () => {
-   toggleFavorite(item.url);
-  };
-
-  card.appendChild(playButton);
-  card.appendChild(favoriteButton);
-  $("channels").appendChild(card);
- });
+async function xtreamRequest(action){
+ const u=new URL(server);
+ u.searchParams.set("username",credentials.username);
+ u.searchParams.set("password",credentials.password);
+ if(action)u.searchParams.set("action",action);
+ const r=await fetch(u);
+ if(!r.ok)throw Error("Serveur inaccessible");
+ return r.json();
 }
-
-function toggleFavorite(url){
- if(favorites.has(url)){
-  favorites.delete(url);
- } else {
-  favorites.add(url);
+function endpoint(path){
+ return server.replace(/\/+$/,"")+"/"+credentials.username+"/"+credentials.password+"/"+path;
+}
+$("connectXtream").onclick=async()=>{
+ server=$("server").value.trim().replace(/\/+$/,"");
+ credentials={username:$("username").value.trim(),password:$("password").value};
+ if(!safeUrl(server)||!credentials.username||!credentials.password){
+  $("xtreamStatus").textContent="Vérifiez le serveur et vos identifiants.";return;
  }
-
- saveFavorites();
- render();
-}
-
-function stopPlayback(){
- const video = $("player");
-
- video.pause();
-
- if(hls){
-  hls.destroy();
-  hls = null;
- }
-
- video.removeAttribute("src");
- video.load();
-}
+ $("connectXtream").disabled=true;
+ $("xtreamStatus").textContent="Connexion...";
+ try{
+  const auth=await xtreamRequest("");
+  if(auth.user_info?.auth!==1)throw Error("Identifiants refusés");
+  save("xtream",{server,credentials});
+  const results=await Promise.all([
+   xtreamRequest("get_live_streams"),
+   xtreamRequest("get_vod_streams"),
+   xtreamRequest("get_series")
+  ]);
+  channels=results[0].map(x=>({name:x.name,url:endpoint("live/"+x.stream_id+".ts"),group:x.category_name||"TV"}));
+  movies=results[1].map(x=>({name:x.name,url:endpoint("movie/"+x.stream_id+"."+((x.container_extension||"mp4").replace(/[^a-z0-9]/gi,""))),group:x.category_name||"Films"}));
+  series=results[2].map(x=>({name:x.name,id:x.series_id,group:x.category_name||"Séries"}));
+  save("channels",channels);save("movies",movies);save("series",series);
+  renderAll();page("live");
+  message("Connexion réussie.");
+ }catch(e){
+  $("xtreamStatus").textContent="Connexion impossible : "+e.message+". Vérifiez les informations et la compatibilité du serveur.";
+ }finally{$("connectXtream").disabled=false}
+};
 
 function play(item){
- current = items.findIndex(x => x.url === item.url);
-
- stopPlayback();
-
- const video = $("player");
-
- $("nowPlaying").textContent = item.name;
- $("playInfo").textContent = "Connexion au flux...";
-
- if(item.url.includes(".m3u8") &&
-    window.Hls && Hls.isSupported()){
-
-  hls = new Hls({
-   enableWorker:true,
-   maxBufferLength:30
-  });
-
-  hls.loadSource(item.url);
-  hls.attachMedia(video);
-
-  hls.on(Hls.Events.MANIFEST_PARSED,() => {
-   video.play().catch(() => {
-    $("playInfo").textContent =
-     "Appuyez sur Lecture pour démarrer.";
-   });
-  });
-
-  hls.on(Hls.Events.ERROR,(_,data) => {
-   if(data.fatal){
-    $("playInfo").textContent =
-     "Erreur HLS : flux inaccessible ou non compatible.";
-    stopPlayback();
-   }
-  });
-
- } else {
-  video.src = item.url;
-
-  video.play().catch(() => {
-   $("playInfo").textContent =
-    "Lecture impossible. Vérifiez le flux ou appuyez sur Lecture.";
-  });
+ const v=$("player");
+ if(hls){hls.destroy();hls=null}
+ v.pause();v.removeAttribute("src");v.load();
+ $("playingTitle").textContent=item.name;
+ $("playStatus").textContent="Chargement du flux...";
+ if(item.url.includes(".m3u8")&&window.Hls&&Hls.isSupported()){
+  hls=new Hls();hls.loadSource(item.url);hls.attachMedia(v);
+  hls.on(Hls.Events.MANIFEST_PARSED,()=>v.play().catch(()=>{$("playStatus").textContent="Appuyez sur Lecture."}));
+  hls.on(Hls.Events.ERROR,(_,d)=>{if(d.fatal)$("playStatus").textContent="Flux inaccessible ou erreur HLS."});
+ }else{
+  v.src=item.url;
+  v.play().catch(()=>$("playStatus").textContent="Lecture impossible. Vérifiez le flux.");
  }
-
- render();
+ if(!favorites.some(x=>x.url===item.url)){}
 }
-
-$("loadUrl").onclick = async () => {
- const url = $("playlistUrl").value.trim();
-
- if(!url){
-  setStatus("Ajoutez un lien M3U.");
-  return;
- }
-
- if(!validUrl(url)){
-  setStatus("Adresse invalide. Utilisez un lien HTTP ou HTTPS.");
-  return;
- }
-
- setStatus("Chargement de la playlist...");
- $("loadUrl").disabled = true;
-
- try {
-  const response = await fetch(url);
-
-  if(!response.ok){
-   throw new Error("HTTP " + response.status);
+function card(item,type){
+ const b=document.createElement("button");
+ b.className="item";
+ const title=document.createElement("strong");title.textContent=item.name;
+ const sub=document.createElement("small");sub.textContent=item.group||type;
+ b.append(title,sub);
+ b.onclick=()=>{
+  if(type==="TV")play(item);
+  else if(item.url){play(item);page("live")}
+  else if(item.id&&credentials){
+   openSeries(item);
   }
-
-  const text = await response.text();
-
-  if(!text.trim().startsWith("#EXTM3U")){
-   throw new Error("Format M3U invalide");
-  }
-
-  loadText(text,"Playlist distante");
-
- } catch(error){
-  setStatus(
-   "Impossible de charger ce lien. Le serveur peut bloquer " +
-   "l'accès depuis le navigateur (CORS). Essayez d'importer " +
-   "le fichier M3U directement."
-  );
- } finally {
-  $("loadUrl").disabled = false;
- }
-};
-
-$("fileBtn").onclick = () => $("fileInput").click();
-
-$("fileInput").onchange = event => {
- const file = event.target.files[0];
- if(!file) return;
-
- const reader = new FileReader();
-
- reader.onload = () => {
-  loadText(reader.result,file.name);
-  $("fileInput").value = "";
  };
-
- reader.onerror = () => {
-  setStatus("Impossible de lire ce fichier.");
- };
-
- reader.readAsText(file);
-};
-
-$("search").oninput = render;
-
-$("favOnly").onclick = () => {
- favMode = !favMode;
- $("favOnly").textContent =
-  favMode ? "★ Tous les favoris" : "☆ Favoris";
- render();
-};
-
-$("allChannels").onclick = () => {
- favMode = false;
- activeGroup = "Toutes";
- $("favOnly").textContent = "☆ Favoris";
- $("search").value = "";
- render();
-};
-
-$("settingsBtn").onclick = () => {
- $("settings").classList.toggle("hidden");
-};
-
-$("closeSettings").onclick = () => {
- $("settings").classList.add("hidden");
-};
-
-$("changePlaylist").onclick = () => {
- $("settings").classList.add("hidden");
- $("playerPanel").classList.add("hidden");
- $("setup").classList.remove("hidden");
- window.scrollTo({top:0,behavior:"smooth"});
-};
-
-$("clearBtn").onclick = () => {
- if(!confirm("Supprimer la playlist enregistrée ?")) return;
-
- localStorage.removeItem(STORAGE.playlist);
- localStorage.removeItem(STORAGE.name);
-
- stopPlayback();
- items = [];
- current = -1;
-
- $("playerPanel").classList.add("hidden");
- $("settings").classList.add("hidden");
- $("setup").classList.remove("hidden");
-
- $("nowPlaying").textContent = "Choisissez une chaîne";
- setStatus("Playlist supprimée.");
-};
-
-$("clearFav").onclick = () => {
- if(!confirm("Effacer tous les favoris ?")) return;
-
- favorites.clear();
- saveFavorites();
- render();
-};
-
-$("player").addEventListener("error",() => {
- $("playInfo").textContent =
-  "Erreur de lecture : vérifiez le lien et le format du flux.";
-});
-
-$("player").addEventListener("playing",() => {
- $("playInfo").textContent = "Lecture en cours.";
-});
-
-$("player").addEventListener("waiting",() => {
- $("playInfo").textContent = "Chargement du flux...";
-});
-
-function restorePlaylist(){
- const saved = localStorage.getItem(STORAGE.playlist);
-
- if(saved){
-  loadText(
-   saved,
-   localStorage.getItem(STORAGE.name) || "Ma playlist"
-  );
- }
+ return b;
 }
+function renderList(target,list,type,query=""){
+ $(target).innerHTML="";
+ const filtered=list.filter(x=>x.name.toLowerCase().includes(query.toLowerCase()));
+ if(!filtered.length){$(target).textContent="Aucun contenu disponible.";return}
+ filtered.slice(0,500).forEach(x=>$(target).appendChild(card(x,type)));
+}
+function renderAll(){
+ $("liveCount").textContent=channels.length;
+ $("movieCount").textContent=movies.length;
+ $("seriesCount").textContent=series.length;
+ renderList("liveList",channels,"TV",$("liveSearch").value);
+ renderList("movieList",movies,"Film",$("movieSearch").value);
+ renderList("seriesList",series,"Série",$("seriesSearch").value);
+}
+async function openSeries(item){
+ try{
+  const data=await xtreamRequest("get_series_info");
+  const url=new URL(server);
+  url.searchParams.set("username",credentials.username);
+  url.searchParams.set("password",credentials.password);
+  url.searchParams.set("action","get_series_info");
+  url.searchParams.set("series_id",item.id);
+  const r=await fetch(url);
+  const info=await r.json();
+  const episodes=Object.values(info.episodes||{}).flat();
+  const chosen=episodes[0];
+  if(chosen){
+   const ext=chosen.container_extension||"mp4";
+   play({name:item.name+" - "+(chosen.title||"Épisode"),url:endpoint("series/"+chosen.id+"."+ext)});
+   page("live");
+  }else message("Aucun épisode trouvé.");
+ }catch(e){message("Impossible de charger les épisodes de cette série.")}
+}
+$("liveSearch").oninput=renderAll;
+$("movieSearch").oninput=renderAll;
+$("seriesSearch").oninput=renderAll;
 
-restorePlaylist();
+function renderFavorites(){
+ $("favoriteList").innerHTML="";
+ favorites.forEach(x=>$("favoriteList").appendChild(card(x,"TV")));
+ if(!favorites.length)$("favoriteList").textContent="Aucun favori.";
+}
+$("logout").onclick=()=>{
+ if(!confirm("Déconnecter ce compte de cet appareil ?"))return;
+ localStorage.removeItem("shine_xtream");
+ message("Compte déconnecté.");
+};
+$("changePlaylist").onclick=()=>{page("home");$("xtream").classList.remove("hidden");};
+$("removePlaylist").onclick=()=>{
+ if(!confirm("Supprimer les données de playlist ?"))return;
+ channels=[];movies=[];series=[];
+ ["shine_channels","shine_movies","shine_series"].forEach(k=>localStorage.removeItem(k));
+ renderAll();page("home");message("Playlist supprimée.");
+};
+document.querySelectorAll("[data-copy]").forEach(b=>b.onclick=async()=>{
+ try{await navigator.clipboard.writeText(b.dataset.copy);$("paymentStatus").textContent="Numéro copié."}
+ catch(e){$("paymentStatus").textContent="Copie indisponible. Recopiez le numéro affiché."}
+});
+$("player").onplaying=()=>$("playStatus").textContent="Lecture en cours.";
+$("player").onerror=()=>$("playStatus").textContent="Erreur de lecture du flux.";
 
+channels=read("channels",[]);
+movies=read("movies",[]);
+series=read("series",[]);
+favorites=read("favorites",[]);
+const saved=read("xtream",null);
+if(saved){
+ $("server").value=saved.server;
+ $("username").value=saved.credentials.username;
+ $("password").value=saved.credentials.password;
+}
+renderAll();
 </script>
 </body>
 </html>
