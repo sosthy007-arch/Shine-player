@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#080808">
+<meta name="description" content="SHINE PLAYER - lecteur IPTV indépendant">
+<title>SHINE PLAYER</title>
+<style>
+:root{--bg:#080808;--panel:#151515;--panel2:#202020;--gold:#d8ad52;--muted:#aaa;--line:#303030}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:#fff;font:15px Arial,sans-serif;padding-bottom:82px}
+button,input,select{font:inherit}
+button{cursor:pointer;border:0;border-radius:10px;padding:12px 15px;background:var(--gold);color:#111;font-weight:bold}
+button:disabled{opacity:.55;cursor:wait}
+button.secondary{background:#292929;color:#fff;border:1px solid #414141}
+header{position:sticky;top:0;z-index:20;background:#0b0b0bf5;border-bottom:1px solid #333;padding:13px 16px;display:flex;justify-content:space-between;align-items:center}
+.logo{font-size:21px;font-weight:900;letter-spacing:2px}.logo span{color:var(--gold)}
+main{max-width:1150px;margin:auto;padding:15px}
+.hero{position:relative;overflow:hidden;background:radial-gradient(circle at 90% 15%,#71501d55,transparent 38%),linear-gradient(130deg,#302516,#111 65%);border:1px solid #574526;border-radius:17px;padding:24px 20px;margin-bottom:16px;min-height:180px}
+.hero .eyebrow{color:var(--gold);font-weight:bold;letter-spacing:3px;font-size:12px}
+.hero h1{font-size:29px;margin:9px 0}.hero p{color:#ccc;margin:0;line-height:1.5;max-width:570px}
+.hero .hero-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:17px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:15px}
+.nav{position:fixed;bottom:0;left:0;right:0;z-index:30;display:flex;justify-content:space-around;gap:4px;background:#101010f7;border-top:1px solid #393939;padding:8px 4px calc(8px + env(safe-area-inset-bottom))}
+.nav button{flex:1;min-width:0;white-space:nowrap;background:transparent;color:#aaa;border:0;padding:9px 3px;font-size:11px}
+.nav button.active{background:#302719;color:var(--gold)}
+.nav button span{display:block;font-size:18px;margin-bottom:4px}
+input,select{width:100%;background:#0b0b0b;color:#fff;border:1px solid #414141;border-radius:9px;padding:13px;margin:6px 0 12px}
+label{display:block;color:#ccc;font-size:13px;margin-top:8px}
+.row{display:flex;gap:9px;flex-wrap:wrap}.row>*{flex:1;min-width:120px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:10px}
+.item{background:#202020;color:#fff;border:1px solid #393939;text-align:left;min-height:86px;overflow:hidden;position:relative}
+.item strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.item small{display:block;color:#aaa;margin-top:8px}
+.stat{background:#101010;border:1px solid #393939;border-radius:12px;padding:14px}
+.stat strong{display:block;color:var(--gold);font-size:20px;margin-top:7px}
+.device{background:#0d0d0d;border:1px solid #514225;padding:14px;border-radius:12px;overflow-wrap:anywhere}
+#player{width:100%;background:#000;border-radius:12px;aspect-ratio:16/9;max-height:55vh}
+.hidden{display:none!important}
+.muted{color:var(--muted);line-height:1.5}
+.notice{background:#282114;border:1px solid #574526;border-radius:10px;padding:13px;color:#eee0c1;line-height:1.5}
+footer{text-align:center;color:#777;padding:20px;font-size:12px}
+.price{font-size:25px;font-weight:900;color:var(--gold);margin:10px 0}
+.plan{background:#101010;border:1px solid #514225;border-radius:12px;padding:15px}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.toolbar input{flex:1;min-width:160px}
+#message{padding:10px;color:var(--gold);line-height:1.5;min-height:20px}
+.section-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:18px 0 10px}
+.section-head h3{margin:0}
+.section-head button{padding:8px 11px;font-size:12px}
+.quick-card{background:linear-gradient(145deg,#252017,#141414);border:1px solid #514225;border-radius:12px;padding:14px;text-align:left;color:#fff}
+.quick-card b{display:block;color:var(--gold);margin-bottom:6px}
+.favorite-btn{margin-top:9px;width:100%;padding:8px;font-size:12px}
+.category-row{display:flex;gap:8px;overflow-x:auto;padding:2px 0 10px}
+.category-row button{white-space:nowrap;background:#242424;color:#ddd;border:1px solid #393939}
+.category-row button.active{background:var(--gold);color:#111}
+#seriesEpisodes{margin-top:12px}
+@media(min-width:800px){.player-layout{display:grid;grid-template-columns:1.5fr 1fr;gap:15px}.hero{padding:30px}.hero h1{font-size:36px}}
+</style>
+</head>
+<body>
+<header>
+ <div class="logo">SHINE <span>PLAYER</span></div>
+ <button class="secondary" id="settingsQuick" aria-label="Paramètres">⚙</button>
+</header>
+
+<main>
+<section id="home">
+ <div class="hero">
+  <div class="eyebrow">WELCOME TO</div>
+  <h1>SHINE PLAYER</h1>
+  <p>Votre univers de divertissement. Regardez vos contenus préférés depuis votre propre abonnement IPTV.</p>
+  <div class="hero-actions">
+   <button id="heroConnect">＋ Connecter une playlist</button>
+   <button class="secondary" id="heroPremium">Accès Premium</button>
+  </div>
+ </div>
+
+ <div class="grid">
+  <div class="stat">Télévision<strong id="liveCount">0</strong></div>
+  <div class="stat">Films<strong id="movieCount">0</strong></div>
+  <div class="stat">Séries<strong id="seriesCount">0</strong></div>
+ </div>
+
+ <div class="section-head"><h3>Explorer</h3></div>
+ <div class="grid">
+  <button class="quick-card" data-go="live"><b>📺 TV EN DIRECT</b><small>Vos chaînes télévisées</small></button>
+  <button class="quick-card" data-go="movies"><b>🎬 FILMS</b><small>Votre vidéothèque</small></button>
+  <button class="quick-card" data-go="series"><b>🍿 SÉRIES</b><small>Vos séries et épisodes</small></button>
+  <button class="quick-card" data-go="favorites"><b>⭐ FAVORIS</b><small>Vos contenus enregistrés</small></button>
+ </div>
+
+ <div class="section-head"><h3>Reprendre le divertissement</h3><button class="secondary" id="homeBrowse">Voir la TV</button></div>
+ <div id="homeContent" class="grid"></div>
+
+ <div class="panel" style="margin-top:16px">
+  <h3>Connecter votre playlist</h3>
+  <p class="muted">Utilisez les informations fournies par votre fournisseur IPTV.</p>
+  <div class="row">
+   <button id="openXtream">Xtream Codes</button>
+   <button class="secondary" id="openM3u">Playlist M3U</button>
+  </div>
+ </div>
+ <div class="panel">
+  <h3>Mon appareil</h3>
+  <div class="device">
+   <div class="muted">Device ID</div><strong id="deviceId">Chargement...</strong>
+   <div class="toolbar"><button class="secondary" id="copyDevice">Copier l'identifiant</button></div>
+   <div class="muted">Identifiant local de cet appareil, pas une adresse MAC.</div>
+  </div>
+ </div>
+</section>
+
+<section id="xtream" class="panel hidden">
+ <h3>Connexion Xtream Codes</h3>
+ <p class="muted">Entrez les informations fournies par votre fournisseur IPTV.</p>
+ <label>Adresse du serveur</label><input id="server" placeholder="http://serveur.com:8080">
+ <label>Nom d'utilisateur</label><input id="username" placeholder="Votre identifiant" autocomplete="username">
+ <label>Mot de passe</label><input id="password" type="password" placeholder="Votre mot de passe" autocomplete="current-password">
+ <div class="row"><button id="connectXtream">Se connecter</button><button class="secondary" id="cancelXtream">Annuler</button></div>
+ <div id="xtreamStatus" class="muted"></div>
+</section>
+
+<section id="m3u" class="panel hidden">
+ <h3>Importer une playlist M3U</h3>
+ <label>Lien de votre playlist</label><input id="m3uUrl" placeholder="https://exemple.com/playlist.m3u">
+ <button id="loadM3u">Charger le lien</button>
+ <p class="muted">Ou importer un fichier M3U depuis votre téléphone.</p>
+ <input type="file" id="m3uFile" accept=".m3u,.m3u8,.txt">
+ <button class="secondary" id="cancelM3u">Annuler</button>
+ <div id="m3uStatus" class="muted"></div>
+</section>
+
+<section id="live" class="panel hidden">
+ <h3>📺 Télévision en direct</h3>
+ <div class="player-layout">
+  <div><video id="player" controls playsinline></video><h3 id="playingTitle">Choisissez une chaîne</h3><p id="playStatus" class="muted">Lecteur prêt.</p></div>
+  <div><input id="liveSearch" placeholder="Rechercher une chaîne..."><div id="liveCategories" class="category-row"></div><div id="liveList" class="grid"></div></div>
+ </div>
+</section>
+
+<section id="movies" class="panel hidden">
+ <h3>🎬 Films</h3><input id="movieSearch" placeholder="Rechercher un film..."><div id="movieList" class="grid"></div>
+</section>
+<section id="series" class="panel hidden">
+ <h3>📺 Séries</h3><input id="seriesSearch" placeholder="Rechercher une série..."><div id="seriesList" class="grid"></div><div id="seriesEpisodes"></div>
+</section>
+<section id="favorites" class="panel hidden">
+ <h3>⭐ Mes favoris</h3><div id="favoriteList" class="grid"></div>
+</section>
+
+<section id="settings" class="panel hidden">
+ <h3>⚙ Paramètres</h3>
+ <div class="device"><p>Identifiant de cet appareil</p><strong id="deviceSettings"></strong></div>
+ <h4>Gestion de la playlist</h4>
+ <div class="row"><button id="changePlaylist">Changer de playlist</button><button class="secondary" id="removePlaylist">Supprimer la playlist</button></div>
+ <h4>Compte</h4><p class="muted">Les identifiants Xtream peuvent être conservés sur cet appareil.</p>
+ <button class="secondary" id="logout">Déconnecter le compte</button>
+ <div class="notice" style="margin-top:15px">L'identifiant Device ID ne constitue pas une activation serveur. La validation d'un appareil nécessite un backend sécurisé.</div>
+</section>
+
+<section id="payment" class="panel hidden">
+ <h3 style="color:var(--gold)">SHINE PLAYER · ABONNEMENT</h3>
+ <p class="muted">Le paiement en ligne n'est pas obligatoire pour utiliser le lecteur.</p>
+ <div class="grid">
+  <div class="plan"><h4>Abonnement annuel</h4><div class="price">7 000 FCFA</div><p class="muted">Valable 12 mois.</p></div>
+  <div class="plan"><h4>Accès à vie</h4><div class="price">14 000 FCFA</div><p class="muted">Sans renouvellement.</p></div>
+ </div>
+ <h3>Moyens de paiement manuel</h3>
+ <div class="panel"><strong>MTN Mobile Money</strong><div class="price">+242 06 896 01 84</div><button class="secondary" data-copy="+242068960184">Copier le numéro</button></div>
+ <div class="panel"><strong>Airtel Money</strong><div class="price">+242 05 500 00 72</div><button class="secondary" data-copy="+242055000072">Copier le numéro</button></div>
+ <div class="notice">Après le transfert, conservez votre reçu et contactez l'administrateur pour vérifier le paiement. Aucune activation automatique n'est effectuée ici.</div>
+ <p id="paymentStatus" class="muted"></p>
+</section>
+
+<div id="message" aria-live="polite"></div>
+</main>
+
+<nav class="nav" aria-label="Navigation principale">
+ <button class="active" data-page="home"><span>⌂</span>Accueil</button>
+ <button data-page="live"><span>▣</span>TV en direct</button>
+ <button data-page="movies"><span>🎬</span>Films</button>
+ <button data-page="series"><span>▤</span>Séries</button>
+ <button data-page="plus"><span>⋯</span>Plus</button>
+</nav>
+<footer>SHINE PLAYER · Lecteur indépendant · 2026</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/hls.js@1.6.13"></script>
+<script>
+"use strict";
+const $=id=>document.getElementById(id);
+const pages=["home","live","movies","series","favorites","settings","payment"];
+let channels=[],movies=[],series=[],favorites=[],credentials=null,server="",hls=null,activeCategory="Toutes";
+function message(s){$("message").textContent=s}
+function save(key,value){try{localStorage.setItem("shine_"+key,JSON.stringify(value));return true}catch(e){message("Stockage indisponible sur cet appareil.");return false}}
+function read(key,def){try{return JSON.parse(localStorage.getItem("shine_"+key))??def}catch(e){return def}}
+function deviceID(){
+ let id=localStorage.getItem("shine_device_id");
+ if(!id){const bytes=crypto.getRandomValues(new Uint8Array(6));id="SHINE-"+Array.from(bytes,x=>x.toString(16).padStart(2,"0")).join("").toUpperCase();localStorage.setItem("shine_device_id",id)}
+ return id;
+}
+const id=deviceID();$("deviceId").textContent=id;$("deviceSettings").textContent=id;
+
+function page(name){
+ if(name==="plus")name="settings";
+ pages.forEach(p=>$(p).classList.toggle("hidden",p!==name));
+ document.querySelectorAll("[data-page]").forEach(b=>b.classList.toggle("active",b.dataset.page===name|| (name==="settings"&&b.dataset.page==="plus")));
+ if(name==="favorites")renderFavorites();
+ if(name==="live")renderAll();
+}
+document.querySelectorAll("[data-page]").forEach(b=>b.onclick=()=>page(b.dataset.page));
+document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>page(b.dataset.go));
+$("settingsQuick").onclick=()=>page("settings");
+$("heroConnect").onclick=()=>openConnection();
+$("heroPremium").onclick=()=>page("payment");
+$("homeBrowse").onclick=()=>page("live");
+function openConnection(){page("home");$("xtream").classList.remove("hidden");$("m3u").classList.add("hidden");$("xtream").scrollIntoView({behavior:"smooth",block:"start"})}
+$("openXtream").onclick=()=>{$("xtream").classList.remove("hidden");$("m3u").classList.add("hidden");$("xtream").scrollIntoView({behavior:"smooth"})};
+$("openM3u").onclick=()=>{$("m3u").classList.remove("hidden");$("xtream").classList.add("hidden");$("m3u").scrollIntoView({behavior:"smooth"})};
+$("cancelXtream").onclick=()=>$("xtream").classList.add("hidden");
+$("cancelM3u").onclick=()=>$("m3u").classList.add("hidden");
+$("copyDevice").onclick=async()=>{try{await navigator.clipboard.writeText(id);message("Identifiant copié.")}catch(e){message("Copiez manuellement : "+id)}};
+
+function safeUrl(s){try{const u=new URL(s);return ["http:","https:"].includes(u.protocol)}catch(e){return false}}
+function parseM3U(text){
+ const result=[];let meta={};
+ for(const raw of String(text).replace(/^\uFEFF/,"").split(/\r?\n/)){
+  const line=raw.trim();if(!line)continue;
+  if(line.startsWith("#EXTINF")){
+   const comma=line.lastIndexOf(",");const attrs=line.slice(0,comma<0?line.length:comma);
+   const get=k=>attrs.match(new RegExp(k+'="([^"]*)"','i'))?.[1]||"";
+   meta={name:comma<0?"Chaîne":line.slice(comma+1).trim(),group:get("group-title")||"Autres",logo:get("tvg-logo")};
+  }else if(!line.startsWith("#")){if(safeUrl(line))result.push({...meta,name:meta.name||"Chaîne",group:meta.group||"Autres",url:line});meta={}}
+ }
+ return result;
+}
+function loadChannels(list){
+ channels=list;movies=[];series=[];favorites=favorites.filter(f=>list.some(x=>x.url===f.url));
+ save("channels",channels);save("movies",movies);save("series",series);save("favorites",favorites);
+ renderAll();$("m3u").classList.add("hidden");$("xtream").classList.add("hidden");page("live");message(channels.length+" chaînes chargées.");
+}
+$("loadM3u").onclick=async()=>{
+ const url=$("m3uUrl").value.trim();if(!safeUrl(url)){$("m3uStatus").textContent="Lien HTTP/HTTPS invalide.";return}
+ $("loadM3u").disabled=true;$("m3uStatus").textContent="Chargement de la playlist...";
+ try{const r=await fetch(url);if(!r.ok)throw Error("HTTP "+r.status);const list=parseM3U(await r.text());if(!list.length)throw Error("Aucune chaîne valide trouvée");loadChannels(list)}
+ catch(e){$("m3uStatus").textContent="Impossible de charger ce lien. Le serveur peut bloquer l'accès (CORS). Essayez d'importer le fichier M3U."}
+ finally{$("loadM3u").disabled=false}
+};
+$("m3uFile").onchange=e=>{
+ const f=e.target.files&&e.target.files[0];if(!f)return;
+ const reader=new FileReader();reader.onload=()=>{const list=parseM3U(reader.result);if(!list.length){$("m3uStatus").textContent="Aucune chaîne valide trouvée dans ce fichier.";return}loadChannels(list)};
+ reader.onerror=()=>$("m3uStatus").textContent="Erreur de lecture du fichier.";reader.readAsText(f);
+};
+
+function apiUrl(action,extra={}){
+ const u=new URL(server.replace(/\/+$/,"")+"/player_api.php");
+ u.searchParams.set("username",credentials.username);u.searchParams.set("password",credentials.password);
+ if(action)u.searchParams.set("action",action);
+ Object.entries(extra).forEach(([k,v])=>u.searchParams.set(k,String(v)));
+ return u.toString();
+}
+async function xtreamRequest(action,extra={}){
+ const r=await fetch(apiUrl(action,extra));if(!r.ok)throw Error("Serveur inaccessible (HTTP "+r.status+")");
+ const data=await r.json();if(data&&data.user_info&&Number(data.user_info.auth)===0)throw Error("Identifiants refusés");return data;
+}
+function streamEndpoint(kind,streamId,ext){
+ const base=server.replace(/\/+$/,"");const u=new URL(base+"/"+kind+"/"+encodeURIComponent(credentials.username)+"/"+encodeURIComponent(credentials.password)+"/"+encodeURIComponent(streamId)+(ext?"."+ext:""));
+ return u.toString();
+}
+$("connectXtream").onclick=async()=>{
+ server=$("server").value.trim().replace(/\/+$/,"");
+ credentials={username:$("username").value.trim(),password:$("password").value};
+ if(!safeUrl(server)||!credentials.username||!credentials.password){$("xtreamStatus").textContent="Vérifiez l'adresse du serveur et vos identifiants.";return}
+ $("connectXtream").disabled=true;$("xtreamStatus").textContent="Vérification du compte...";
+ try{
+  const auth=await xtreamRequest("");
+  if(!auth.user_info||Number(auth.user_info.auth)!==1)throw Error("Identifiants refusés");
+  const [liveData,vodData,seriesData]=await Promise.all([
+   xtreamRequest("get_live_streams"),xtreamRequest("get_vod_streams"),xtreamRequest("get_series")
+  ]);
+  if(!Array.isArray(liveData)||!Array.isArray(vodData)||!Array.isArray(seriesData))throw Error("Réponse du serveur IPTV invalide");
+  channels=liveData.map(x=>({name:x.name||"Chaîne",url:streamEndpoint("live",x.stream_id,"m3u8"),fallbackUrl:streamEndpoint("live",x.stream_id,"ts"),group:x.category_name||"TV",logo:x.stream_icon||""}));
+  movies=vodData.map(x=>({name:x.name||"Film",url:streamEndpoint("movie",x.stream_id,String(x.container_extension||"mp4").replace(/[^a-z0-9]/gi,"")),group:x.category_name||"Films",logo:x.stream_icon||""}));
+  series=seriesData.map(x=>({name:x.name||"Série",id:x.series_id,group:x.category_name||"Séries",logo:x.cover||""}));
+  save("xtream",{server,credentials});save("channels",channels);save("movies",movies);save("series",series);
+  renderAll();$("xtream").classList.add("hidden");page("live");message("Connexion réussie : "+channels.length+" chaînes, "+movies.length+" films et "+series.length+" séries.");
+ }catch(e){$("xtreamStatus").textContent="Connexion impossible : "+e.message+". Vérifiez les informations ou la disponibilité de l'API du fournisseur."}
+ finally{$("connectXtream").disabled=false}
+};
+
+function play(item){
+ if(!item||!item.url){message("Adresse du contenu indisponible.");return}
+ const v=$("player");if(hls){hls.destroy();hls=null}
+ v.pause();v.removeAttribute("src");v.load();$("playingTitle").textContent=item.name;$("playStatus").textContent="Chargement du flux...";
+ const isHls=/\.m3u8($|\?)/i.test(item.url);
+ if(isHls&&window.Hls&&Hls.isSupported()){
+  hls=new Hls();hls.loadSource(item.url);hls.attachMedia(v);
+  hls.on(Hls.Events.MANIFEST_PARSED,()=>v.play().catch(()=>$("playStatus").textContent="Appuyez sur Lecture."));
+  let triedFallback=false;
+  hls.on(Hls.Events.ERROR,(_,d)=>{
+   if(!d.fatal)return;
+   if(item.fallbackUrl&&!triedFallback){
+    triedFallback=true;hls.destroy();hls=null;v.src=item.fallbackUrl;
+    v.play().catch(()=>$("playStatus").textContent="Les formats HLS et TS sont refusés par le navigateur.");
+   }else $("playStatus").textContent="Flux inaccessible ou erreur HLS.";
+  });
+ }else if(isHls&&v.canPlayType("application/vnd.apple.mpegurl")){v.src=item.url;v.play().catch(()=>$("playStatus").textContent="Appuyez sur Lecture.")}
+ else{v.src=item.url;v.play().catch(()=>$("playStatus").textContent="Lecture impossible. Vérifiez le flux ou son format.")}
+}
+function isFavorite(item){return favorites.some(x=>(x.url&&item.url&&x.url===item.url)||(!x.url&&x.id&&item.id&&String(x.id)===String(item.id)))}
+function toggleFavorite(item){
+ if(isFavorite(item))favorites=favorites.filter(x=>!((x.url&&item.url&&x.url===item.url)||(!x.url&&x.id&&item.id&&String(x.id)===String(item.id))));
+ else favorites.push({...item});
+ save("favorites",favorites);renderFavorites();renderAll();message(isFavorite(item)?"Ajouté aux favoris.":"Retiré des favoris.");
+}
+function card(item,type){
+ const wrap=document.createElement("div");wrap.className="panel";wrap.style.padding="10px";wrap.style.margin="0";
+ const b=document.createElement("button");b.className="item";b.style.width="100%";
+ const title=document.createElement("strong");title.textContent=item.name||"Contenu";
+ const sub=document.createElement("small");sub.textContent=item.group||type;b.append(title,sub);
+ b.onclick=()=>{if(type==="TV"||item.url){play(item);page("live")}else if(item.id)openSeries(item)};
+ const fav=document.createElement("button");fav.className="secondary favorite-btn";fav.textContent=isFavorite(item)?"★ Retirer des favoris":"☆ Ajouter aux favoris";fav.onclick=()=>toggleFavorite(item);
+ wrap.append(b,fav);return wrap;
+}
+function renderList(target,list,type,query=""){
+ const root=$(target);root.innerHTML="";
+ const q=query.trim().toLocaleLowerCase("fr");
+ const filtered=list.filter(x=>(x.name||"").toLocaleLowerCase("fr").includes(q));
+ if(!filtered.length){root.textContent="Aucun contenu disponible.";return}
+ filtered.slice(0,500).forEach(x=>root.appendChild(card(x,type)));
+}
+function renderCategories(){
+ const root=$("liveCategories");root.innerHTML="";
+ const groups=["Toutes",...new Set(channels.map(x=>x.group||"Autres"))].slice(0,40);
+ groups.forEach(g=>{const b=document.createElement("button");b.textContent=g;b.classList.toggle("active",activeCategory===g);b.onclick=()=>{activeCategory=g;renderAll()};root.appendChild(b)});
+}
+function renderAll(){
+ $("liveCount").textContent=channels.length;$("movieCount").textContent=movies.length;$("seriesCount").textContent=series.length;
+ const q=$("liveSearch").value.toLocaleLowerCase("fr");
+ const live=channels.filter(x=>(activeCategory==="Toutes"||(x.group||"Autres")===activeCategory)&&(x.name||"").toLocaleLowerCase("fr").includes(q));
+ renderList("liveList",live,"TV");
+ renderList("movieList",movies,"Film",$("movieSearch").value);
+ renderList("seriesList",series,"Série",$("seriesSearch").value);
+ renderCategories();
+ const home=$("homeContent");home.innerHTML="";
+ const picks=[...channels.slice(0,4),...movies.slice(0,2),...series.slice(0,2)];
+ if(!picks.length){home.innerHTML='<p class="muted">Connectez une playlist pour afficher vos contenus ici.</p>'}
+ else picks.slice(0,6).forEach(x=>home.appendChild(card(x,x.url?(channels.includes(x)?"TV":"Film"):"Série")));
+}
+async function openSeries(item){
+ if(!credentials){message("La lecture des séries Xtream nécessite une connexion.");return}
+ $("seriesEpisodes").textContent="Chargement des épisodes...";
+ try{
+  const info=await xtreamRequest("get_series_info",{series_id:item.id});
+  const episodes=Object.values(info.episodes||{}).flat();
+  const root=$("seriesEpisodes");root.innerHTML="<h4>"+escapeHtml(item.name)+" · Épisodes</h4>";
+  if(!episodes.length){root.textContent="Aucun épisode disponible.";return}
+  episodes.forEach((ep,index)=>{
+   const ext=String(ep.container_extension||"mp4").replace(/[^a-z0-9]/gi,"")||"mp4";
+   const b=document.createElement("button");b.className="secondary";b.style.display="block";b.style.width="100%";b.style.textAlign="left";b.style.margin="6px 0";
+   b.textContent=(ep.title||("Épisode "+(index+1)))+" · Saison "+(ep.season||"");
+   b.onclick=()=>{play({name:item.name+" - "+(ep.title||"Épisode "+(index+1)),url:streamEndpoint("series",ep.id,ext)});page("live")};root.appendChild(b);
+  });
+ }catch(e){$("seriesEpisodes").textContent="Impossible de charger les épisodes : "+e.message}
+}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+$("liveSearch").oninput=renderAll;$("movieSearch").oninput=renderAll;$("seriesSearch").oninput=renderAll;
+
+function renderFavorites(){
+ const root=$("favoriteList");root.innerHTML="";
+ if(!favorites.length){root.textContent="Aucun favori enregistré.";return}
+ favorites.forEach(x=>root.appendChild(card(x,x.url?"TV":"Série")));
+}
+$("logout").onclick=()=>{
+ if(!confirm("Déconnecter ce compte de cet appareil ?"))return;
+ credentials=null;server="";localStorage.removeItem("shine_xtream");
+ $("server").value="";$("username").value="";$("password").value="";
+ message("Compte Xtream déconnecté. Les playlists déjà chargées restent disponibles sur cet appareil.");
+};
+$("changePlaylist").onclick=()=>openConnection();
+$("removePlaylist").onclick=()=>{
+ if(!confirm("Supprimer les playlists et contenus enregistrés sur cet appareil ?"))return;
+ channels=[];movies=[];series=[];favorites=[];credentials=null;server="";
+ ["shine_channels","shine_movies","shine_series","shine_favorites","shine_xtream"].forEach(k=>localStorage.removeItem(k));
+ $("server").value="";$("username").value="";$("password").value="";
+ renderAll();renderFavorites();page("home");message("Données de playlist supprimées.");
+};
+document.querySelectorAll("[data-copy]").forEach(b=>b.onclick=async()=>{
+ try{await navigator.clipboard.writeText(b.dataset.copy);$("paymentStatus").textContent="Numéro copié."}
+ catch(e){$("paymentStatus").textContent="Copie indisponible. Recopiez le numéro affiché."}
+});
+$("player").onplaying=()=>$("playStatus").textContent="Lecture en cours.";
+$("player").onerror=()=>$("playStatus").textContent="Erreur de lecture du flux.";
+
+channels=read("channels",[]);movies=read("movies",[]);series=read("series",[]);favorites=read("favorites",[]);
+const saved=read("xtream",null);
+if(saved&&saved.server&&saved.credentials){server=saved.server;credentials=saved.credentials;$("server").value=server;$("username").value=credentials.username;$("password").value=credentials.password}
+renderAll();
+</script>
+</body>
+</html>

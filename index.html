@@ -280,7 +280,7 @@ $("connectXtream").onclick=async()=>{
    xtreamRequest("get_live_streams"),xtreamRequest("get_vod_streams"),xtreamRequest("get_series")
   ]);
   if(!Array.isArray(liveData)||!Array.isArray(vodData)||!Array.isArray(seriesData))throw Error("Réponse du serveur IPTV invalide");
-  channels=liveData.map(x=>({name:x.name||"Chaîne",url:streamEndpoint("live",x.stream_id,"ts"),group:x.category_name||"TV",logo:x.stream_icon||""}));
+  channels=liveData.map(x=>({name:x.name||"Chaîne",url:streamEndpoint("live",x.stream_id,"m3u8"),fallbackUrl:streamEndpoint("live",x.stream_id,"ts"),group:x.category_name||"TV",logo:x.stream_icon||""}));
   movies=vodData.map(x=>({name:x.name||"Film",url:streamEndpoint("movie",x.stream_id,String(x.container_extension||"mp4").replace(/[^a-z0-9]/gi,"")),group:x.category_name||"Films",logo:x.stream_icon||""}));
   series=seriesData.map(x=>({name:x.name||"Série",id:x.series_id,group:x.category_name||"Séries",logo:x.cover||""}));
   save("xtream",{server,credentials});save("channels",channels);save("movies",movies);save("series",series);
@@ -297,7 +297,14 @@ function play(item){
  if(isHls&&window.Hls&&Hls.isSupported()){
   hls=new Hls();hls.loadSource(item.url);hls.attachMedia(v);
   hls.on(Hls.Events.MANIFEST_PARSED,()=>v.play().catch(()=>$("playStatus").textContent="Appuyez sur Lecture."));
-  hls.on(Hls.Events.ERROR,(_,d)=>{if(d.fatal)$("playStatus").textContent="Flux inaccessible ou erreur HLS."});
+  let triedFallback=false;
+  hls.on(Hls.Events.ERROR,(_,d)=>{
+   if(!d.fatal)return;
+   if(item.fallbackUrl&&!triedFallback){
+    triedFallback=true;hls.destroy();hls=null;v.src=item.fallbackUrl;
+    v.play().catch(()=>$("playStatus").textContent="Les formats HLS et TS sont refusés par le navigateur.");
+   }else $("playStatus").textContent="Flux inaccessible ou erreur HLS.";
+  });
  }else if(isHls&&v.canPlayType("application/vnd.apple.mpegurl")){v.src=item.url;v.play().catch(()=>$("playStatus").textContent="Appuyez sur Lecture.")}
  else{v.src=item.url;v.play().catch(()=>$("playStatus").textContent="Lecture impossible. Vérifiez le flux ou son format.")}
 }
